@@ -38,7 +38,7 @@ public class TimelineActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
-        /*
+/*
 //TESTING
         PostsDatabaseHelper databaseHelper = PostsDatabaseHelper.getInstance(this);
 
@@ -64,7 +64,8 @@ public class TimelineActivity extends AppCompatActivity {
         Tweet samplePost2 = new Tweet();
         samplePost2.user = sampleUser;
         samplePost2.body = "Won won!";
-        samplePost.createdAt = "Mon Aug 6";
+        samplePost2.createdAt = "Mon Aug 6";
+        samplePost2.uid = 456;
 
         databaseHelper.addPost(samplePost);
         databaseHelper.addPost(samplePost2);
@@ -78,8 +79,7 @@ public class TimelineActivity extends AppCompatActivity {
 
         if (true) return;
         //END OF TESTING
-        */
-
+*/
 
 
         //setup database

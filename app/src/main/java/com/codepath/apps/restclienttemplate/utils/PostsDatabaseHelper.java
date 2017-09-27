@@ -17,7 +17,7 @@ import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 public class PostsDatabaseHelper extends SQLiteOpenHelper {
     // Database Info
-    private static final String DATABASE_NAME = "tweetsDatabase";
+    private static final String DATABASE_NAME = "tweetsDB";
     private static final int DATABASE_VERSION = 1;
 
     // Table Names
@@ -26,6 +26,7 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
 
     // Tweet Table Columns
     private static final String KEY_POST_ID = "id";
+    private static final String KEY_TWEET_ID = "tweetId";
     private static final String KEY_POST_USER_ID_FK = "userId";
     private static final String KEY_POST_TEXT = "text";
     private static final String KEY_POST_CREATED = "createdAt";
@@ -72,6 +73,7 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
                 KEY_POST_ID + " INTEGER PRIMARY KEY," + // Define a primary key
                 KEY_POST_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
                 KEY_POST_TEXT + " TEXT," + // Define a created date
+                KEY_TWEET_ID + " INTEGER," +
                 KEY_POST_CREATED + " TEXT" +   // Define post body
                 ")";
 
@@ -112,10 +114,13 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
             long userId = addOrUpdateUser(post.user);
 
             ContentValues values = new ContentValues();
-            values.put(KEY_POST_USER_ID_FK, userId);
+            values.put(KEY_POST_USER_ID_FK, (Long)userId);
             values.put(KEY_POST_TEXT, post.body);
-            values.put(KEY_POST_ID, post.uid);
+            values.put(KEY_TWEET_ID, (Long)post.uid);
             values.put(KEY_POST_CREATED, post.createdAt);
+
+            // try to make unique
+            values.put(KEY_POST_ID, (Long)post.uid);
 
             // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
             db.insertOrThrow(TABLE_POSTS, null, values);
@@ -205,7 +210,7 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
                     Tweet newPost = new Tweet();
                     newPost.body = cursor.getString(cursor.getColumnIndex(KEY_POST_TEXT));
                     newPost.createdAt = cursor.getString(cursor.getColumnIndex(KEY_POST_CREATED));
-                    newPost.uid = cursor.getLong(cursor.getColumnIndex(KEY_POST_ID));
+                    newPost.uid = cursor.getLong(cursor.getColumnIndex(KEY_TWEET_ID));
 
                     newPost.user = newUser;
                     posts.add(newPost);

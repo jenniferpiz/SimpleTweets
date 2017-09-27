@@ -15,6 +15,7 @@ import com.codepath.apps.restclienttemplate.models.Tweet;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,6 +30,9 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
 
     public TweetAdapter(List<Tweet> mTweets) {
         this.mTweets = mTweets;
+
+        // do reverse order
+        Collections.reverse(this.mTweets);
     }
 
     @Override
