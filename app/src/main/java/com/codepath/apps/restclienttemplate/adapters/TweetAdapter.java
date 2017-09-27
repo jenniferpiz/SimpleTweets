@@ -1,4 +1,4 @@
-package adapters;
+package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -70,11 +70,17 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         }
 
         // shorten relative time
-        int cutIndex =  relativeDate.indexOf(' ')+1;
-        String str = relativeDate.replace(" ", "").substring(0, cutIndex);
+        String str;
+        if ("Yesterday".equals(relativeDate)) {
+            str = "1d";
+        } else {
+            int cutIndex = relativeDate.indexOf(' ') + 1;
+            str = relativeDate.replace(" ", "").substring(0, cutIndex);
+        }
 
         return str;
     }
+
 
     @Override
     public int getItemCount() {
