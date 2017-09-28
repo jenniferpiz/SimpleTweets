@@ -35,6 +35,10 @@ public class TweetFragment extends DialogFragment {
         return fragment;
     }
 
+    public interface FinishTweetListener {
+        void onPassTweetMsg(String s);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,7 +51,7 @@ public class TweetFragment extends DialogFragment {
 
         etTweetMsg = (EditText) view.findViewById(R.id.etTweetMsg);
         // Fetch arguments from bundle and set title
-        String title = getArguments().getString("title", "Enter Name");
+        String title = getArguments().getString("title", "Tweet");
         getDialog().setTitle(title);
         // Show soft keyboard automatically and request focus to field
         etTweetMsg.requestFocus();
@@ -61,6 +65,9 @@ public class TweetFragment extends DialogFragment {
             public void onClick(View view) {
 
                 Log.d("DEBUG", "on tweet button click");
+                FinishTweetListener l = (FinishTweetListener)getActivity();
+                l.onPassTweetMsg(etTweetMsg.getText().toString());
+
                 // Close the dialog and return back to the parent activity
                 dismiss();
 

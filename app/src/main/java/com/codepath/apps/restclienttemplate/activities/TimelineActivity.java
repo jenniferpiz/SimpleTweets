@@ -30,13 +30,13 @@ import java.util.Collections;
 
 import cz.msebera.android.httpclient.Header;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements TweetFragment.FinishTweetListener {
 
     private TwitterClient client;
     private TweetAdapter tweetAdapter;
     private ArrayList<Tweet> tweets;
     private RecyclerView rvTweets;
-    ArrayList<Tweet> dbTweets;
+    private ArrayList<Tweet> dbTweets;
     private EndlessRecyclerViewScrollListener scrollListener;
     static private PostsDatabaseHelper db;
 
@@ -218,16 +218,20 @@ public class TimelineActivity extends AppCompatActivity {
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 Log.d("TwitterClient", response.toString());
 
-                int startIndex = 1; // we exclude the first in the list since it duplicates previous query
-                //start when we started querying from Twitter?
-                if (tweetAdapter.getItemCount() == 0) {
+                int startIndex;
+
+                if (tweetAdapter.getItemCount() != 0) {
+                    // we exclude the first in the list since it duplicates previous query
+                    startIndex = 1;
+                } else {
                     // initially, there won't be a duplicate so we can set this to 0
                     startIndex = 0;
 
-                    //reset
+                    /*reset
                     tweets.clear();
                     tweetAdapter.notifyDataSetChanged();
                     scrollListener.resetState();
+                    */
 
                 }
 
@@ -243,13 +247,15 @@ public class TimelineActivity extends AppCompatActivity {
                     tweetAdapter.notifyItemInserted(tweets.size()-1); // TODO: delete this?
                 }
 
-                int n_tweets = tweets.size();
                 // add dbTweets, if any
+                int n_tweets = tweets.size();
                 if (dbTweets.size() > 0) {
 
-                    // to simplify, only add dbTweets if total new tweets < maxTweets
-                    // but we can also check for ids if matching last & first then we add
-                    if (n_tweets < TwitterClient.maxTweets) {
+
+                    // If there's a RestAPI to check if there are more new tweets>maxTweets then we
+                    // can use that to check when to add the persistent dbTweets but for now
+                    // to simplify, only add dbTweets if new tweets < maxTweets-1
+                    if (n_tweets < (TwitterClient.maxTweets - 1)) {
                         tweets.addAll(dbTweets);
                         tweetAdapter.notifyItemRangeInserted(n_tweets, dbTweets.size()-1);
                     }
@@ -273,6 +279,43 @@ public class TimelineActivity extends AppCompatActivity {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 Log.d("TwitterClient", errorResponse.toString());
                 new Throwable().printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public void onPassTweetMsg(String s) {
+        String tweetMsg = s;
+
+        client.postNewTweet(s, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                super.onSuccess(statusCode, headers, responseString);
             }
         });
     }
