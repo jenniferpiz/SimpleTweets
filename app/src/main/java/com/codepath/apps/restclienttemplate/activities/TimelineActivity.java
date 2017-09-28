@@ -1,19 +1,23 @@
 package com.codepath.apps.restclienttemplate.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
-import com.codepath.apps.restclienttemplate.TwitterClient;
 import com.codepath.apps.restclienttemplate.adapters.TweetAdapter;
+import com.codepath.apps.restclienttemplate.fragments.TweetFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.restclienttemplate.utils.PostsDatabaseHelper;
+import com.codepath.apps.restclienttemplate.utils.TwitterClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -22,6 +26,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -97,16 +102,22 @@ public class TimelineActivity extends AppCompatActivity {
 
         // initializie tweets (get from db)
         tweets = new ArrayList<Tweet>();
-        tweetAdapter = new TweetAdapter(tweets);
 
         ArrayList<Tweet> dbTweets = (ArrayList<Tweet>)db.getAllPosts();
+
+        if (dbTweets.size() > 1) {
+            // reverse order
+            Collections.reverse(dbTweets);
+        }
 
         // if online, get updates then insert in the tweets
         if (isOnline()) {
             if (dbTweets.size() == 0) {
                 populateTimeline(1);
             } else {
+                // query latest tweets
                 populateTimeline(0 - dbTweets.get(0).uid);
+
                 // to make it less complicated, only add dbTweets if total new tweets < 25
                 if (tweets.size() < 25) {
                     tweets.addAll(dbTweets);
@@ -118,12 +129,20 @@ public class TimelineActivity extends AppCompatActivity {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvTweets.setLayoutManager(linearLayoutManager);
+
+        tweetAdapter = new TweetAdapter(tweets);
         rvTweets.setAdapter(tweetAdapter);
 
         // Attach the listener to the AdapterView onCreate
         scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                if (!isOnline()) {
+                    Toast.makeText(getApplicationContext(), "No internet detected!",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 final int curSize = tweetAdapter.getItemCount();
 
                 populateTimeline(tweets.get(curSize-1).uid);
@@ -151,7 +170,28 @@ public class TimelineActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.home:
+                return true;
+
+            case R.id.twit:
+                showComposeDlg();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
     public boolean isOnline() {
+
+        //TODO for testing
+        if (false) return false;
+
         Runtime runtime = Runtime.getRuntime();
         try {
             Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
@@ -160,6 +200,12 @@ public class TimelineActivity extends AppCompatActivity {
         } catch (IOException e)          { e.printStackTrace(); }
         catch (InterruptedException e) { e.printStackTrace(); }
         return false;
+    }
+
+    private void showComposeDlg() {
+        FragmentManager fm = getSupportFragmentManager();
+        TweetFragment tweetFragment = TweetFragment.newInstance("Some Title");
+        tweetFragment.show(fm, "fragment_tweet");
     }
 
 

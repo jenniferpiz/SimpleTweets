@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.R;
-import com.codepath.apps.restclienttemplate.TwitterClient;
+import com.codepath.apps.restclienttemplate.utils.TwitterClient;
 import com.codepath.oauth.OAuthLoginActionBarActivity;
 
 public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
@@ -39,6 +39,7 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 	// i.e Display an error dialog or toast
 	@Override
 	public void onLoginFailure(Exception e) {
+		Toast.makeText(getApplicationContext(), "Login failed.  Try again.", Toast.LENGTH_LONG).show();
 		e.printStackTrace();
 	}
 

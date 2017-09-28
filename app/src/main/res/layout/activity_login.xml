@@ -14,6 +14,7 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="20dp"
         android:onClick="loginToRest"
+        android:background="@color/tweet_blue"
         android:text="@string/login_label" />
 
 </RelativeLayout>
