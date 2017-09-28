@@ -36,6 +36,7 @@ public class TimelineActivity extends AppCompatActivity {
     private TweetAdapter tweetAdapter;
     private ArrayList<Tweet> tweets;
     private RecyclerView rvTweets;
+    ArrayList<Tweet> dbTweets;
     private EndlessRecyclerViewScrollListener scrollListener;
     static private PostsDatabaseHelper db;
 
@@ -103,7 +104,7 @@ public class TimelineActivity extends AppCompatActivity {
         // initializie tweets (get from db)
         tweets = new ArrayList<Tweet>();
 
-        ArrayList<Tweet> dbTweets = (ArrayList<Tweet>)db.getAllPosts();
+        dbTweets = (ArrayList<Tweet>)db.getAllPosts();
 
         if (dbTweets.size() > 1) {
             // reverse order
@@ -118,10 +119,6 @@ public class TimelineActivity extends AppCompatActivity {
                 // query latest tweets
                 populateTimeline(0 - dbTweets.get(0).uid);
 
-                // to make it less complicated, only add dbTweets if total new tweets < 25
-                if (tweets.size() < 25) {
-                    tweets.addAll(dbTweets);
-                }
             }
         } else {
             tweets = dbTweets;
@@ -244,6 +241,19 @@ public class TimelineActivity extends AppCompatActivity {
                     tweets.add(tweet);
                     db.addPost((tweet));
                     tweetAdapter.notifyItemInserted(tweets.size()-1); // TODO: delete this?
+                }
+
+                int n_tweets = tweets.size();
+                // add dbTweets, if any
+                if (dbTweets.size() > 0) {
+
+                    // to simplify, only add dbTweets if total new tweets < maxTweets
+                    // but we can also check for ids if matching last & first then we add
+                    if (n_tweets < TwitterClient.maxTweets) {
+                        tweets.addAll(dbTweets);
+                        tweetAdapter.notifyItemRangeInserted(n_tweets, dbTweets.size()-1);
+                    }
+                    dbTweets.clear();
                 }
             }
 
