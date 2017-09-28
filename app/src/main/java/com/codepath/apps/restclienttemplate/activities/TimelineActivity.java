@@ -88,7 +88,7 @@ public class TimelineActivity extends AppCompatActivity {
         db = PostsDatabaseHelper.getInstance(this);
 
         //TODO for debugging only
-        db.deleteAllPostsAndUsers();
+        //db.deleteAllPostsAndUsers();
 
 
         client = TwitterApp.getRestClient();

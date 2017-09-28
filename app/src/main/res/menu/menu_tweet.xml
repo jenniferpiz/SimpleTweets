@@ -7,7 +7,7 @@ tools:context="com.codepath.jennifergodinez.nytimessearch.activities.TimelineAct
 <item
     android:id="@+id/twit"
     android:orderInCategory="2"
-    android:icon="@drawable/ic_tweet"
+    android:icon="@drawable/twitter_logo"
     app:showAsAction="ifRoom|withText"
     android:title="Filter">
 </item>
