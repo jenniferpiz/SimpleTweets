@@ -49,8 +49,8 @@ public class TwitterClient extends OAuthBaseClient {
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();
 		params.put("count", maxTweets);
-        String idParam = (id == 1) ? "since_id" : "max_id";
-        params.put(idParam, Long.toString(id));
+        String idParam = (id <= 1) ? "since_id" : "max_id";
+        params.put(idParam, Long.toString(Math.abs(id)));
         client.get(apiUrl, params, handler);
 	}
 

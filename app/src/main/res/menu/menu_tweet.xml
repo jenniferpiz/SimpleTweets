@@ -1,0 +1,16 @@
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+tools:context="com.codepath.jennifergodinez.nytimessearch.activities.TimelineActivity">
+
+<item
+    android:id="@+id/twit"
+    android:orderInCategory="2"
+    android:icon="@drawable/ic_tweet"
+    app:showAsAction="ifRoom|withText"
+    android:title="Filter">
+</item>
+
+
+</menu>

@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.TwitterApp;
@@ -19,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -86,7 +88,7 @@ public class TimelineActivity extends AppCompatActivity {
         db = PostsDatabaseHelper.getInstance(this);
 
         //TODO for debugging only
-        //db.deleteAllPostsAndUsers();
+        db.deleteAllPostsAndUsers();
 
 
         client = TwitterApp.getRestClient();
@@ -94,8 +96,25 @@ public class TimelineActivity extends AppCompatActivity {
         rvTweets = (RecyclerView) findViewById(R.id.rvTweet);
 
         // initializie tweets (get from db)
-        tweets = (ArrayList<Tweet>) db.getAllPosts();
+        tweets = new ArrayList<Tweet>();
         tweetAdapter = new TweetAdapter(tweets);
+
+        ArrayList<Tweet> dbTweets = (ArrayList<Tweet>)db.getAllPosts();
+
+        // if online, get updates then insert in the tweets
+        if (isOnline()) {
+            if (dbTweets.size() == 0) {
+                populateTimeline(1);
+            } else {
+                populateTimeline(0 - dbTweets.get(0).uid);
+                // to make it less complicated, only add dbTweets if total new tweets < 25
+                if (tweets.size() < 25) {
+                    tweets.addAll(dbTweets);
+                }
+            }
+        } else {
+            tweets = dbTweets;
+        }
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvTweets.setLayoutManager(linearLayoutManager);
@@ -107,7 +126,7 @@ public class TimelineActivity extends AppCompatActivity {
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 final int curSize = tweetAdapter.getItemCount();
 
-                populateTimeline(curSize);
+                populateTimeline(tweets.get(curSize-1).uid);
 
                 view.post(new Runnable() {
                     @Override
@@ -121,14 +140,30 @@ public class TimelineActivity extends AppCompatActivity {
 
         rvTweets.addOnScrollListener(scrollListener);
 
-        if (tweets.size() == 0) {
-            populateTimeline(0);
-        }
+
     }
 
-    private void populateTimeline (final int curSize) {
-        // get  ID from the last page
-        long id = (curSize > 0) ? tweets.get(curSize-1).uid : 1;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_tweet, menu);
+        return true;
+    }
+
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (IOException e)          { e.printStackTrace(); }
+        catch (InterruptedException e) { e.printStackTrace(); }
+        return false;
+    }
+
+
+    private void populateTimeline (final long id) {
 
         client.getHomeTimeline(id, new JsonHttpResponseHandler() {
             @Override
@@ -142,7 +177,7 @@ public class TimelineActivity extends AppCompatActivity {
 
                 int startIndex = 1; // we exclude the first in the list since it duplicates previous query
                 //start when we started querying from Twitter?
-                if (curSize == 0) {
+                if (tweetAdapter.getItemCount() == 0) {
                     // initially, there won't be a duplicate so we can set this to 0
                     startIndex = 0;
 
