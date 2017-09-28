@@ -46,50 +46,6 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
 
-/*
-//TESTING
-        PostsDatabaseHelper databaseHelper = PostsDatabaseHelper.getInstance(this);
-
-        databaseHelper.deleteAllPostsAndUsers();
-
-        // Create sample data
-        User sampleUser = new User();
-        sampleUser.name = "Miranda";
-        sampleUser.profileImageUrl = "https://i.imgur.com/tGbaZCY.jpg";
-
-        Tweet samplePost = new Tweet();
-        samplePost.createdAt = "Sun Apr 12";
-        samplePost.user = sampleUser;
-        samplePost.body = "Miranda won !";
-        samplePost.uid = 123;
-
-        databaseHelper.addPost(samplePost);
-
-        sampleUser = new User();
-        sampleUser.name = "Steph";
-        sampleUser.profileImageUrl = "https://i.imgur.com/tGbaZCY.jpg";
-
-        Tweet samplePost2 = new Tweet();
-        samplePost2.user = sampleUser;
-        samplePost2.body = "Won won!";
-        samplePost2.createdAt = "Mon Aug 6";
-        samplePost2.uid = 456;
-
-        databaseHelper.addPost(samplePost);
-        databaseHelper.addPost(samplePost2);
-
-        // Get all posts from database
-        List<Tweet> posts = databaseHelper.getAllPosts();
-        Log.d("DEBUG", "Start of List");
-        for (Tweet post : posts) {
-            Log.d("DEBUG", post.body);
-        }
-
-        if (true) return;
-        //END OF TESTING
-*/
-
-
         //setup database
         db = PostsDatabaseHelper.getInstance(this);
 
@@ -117,7 +73,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
                 populateTimeline(1);
             } else {
                 // query latest tweets
-                populateTimeline(0 - dbTweets.get(0).uid);
+                populateTimeline(- dbTweets.get(0).uid);
 
             }
         } else {
@@ -226,13 +182,6 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
                 } else {
                     // initially, there won't be a duplicate so we can set this to 0
                     startIndex = 0;
-
-                    /*reset
-                    tweets.clear();
-                    tweetAdapter.notifyDataSetChanged();
-                    scrollListener.resetState();
-                    */
-
                 }
 
                 for (int i = startIndex; i < response.length(); i++) {
@@ -252,9 +201,9 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
                 if (dbTweets.size() > 0) {
 
 
-                    // If there's a RestAPI to check if there are more new tweets>maxTweets then we
-                    // can use that to check when to add the persistent dbTweets but for now
-                    // to simplify, only add dbTweets if new tweets < maxTweets-1
+                    // The right way is to check for id but
+                    // to simplify making sure we have all the latest tweets, only add dbTweets
+                    // if new tweets < maxTweets-1
                     if (n_tweets < (TwitterClient.maxTweets - 1)) {
                         tweets.addAll(dbTweets);
                         tweetAdapter.notifyItemRangeInserted(n_tweets, dbTweets.size()-1);
@@ -291,39 +240,39 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
+                    // update first before adding new one to top of the list
+                    populateTimeline(- tweets.get(0).uid);
+
+                    // add new tweet
                     Tweet t = Tweet.fromJSON(response);
                     tweets.add(0, t);
+
                     tweetAdapter.notifyItemInserted(0);
+
+                    // make sure we can view it on top of home timeline
                     rvTweets.scrollToPosition(0);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
 
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                super.onSuccess(statusCode, headers, response);
-            }
-
-            @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                super.onFailure(statusCode, headers, throwable, errorResponse);
+                throwable.printStackTrace();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
+               throwable.printStackTrace();
             }
 
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                super.onSuccess(statusCode, headers, responseString);
-            }
+
         });
     }
 }
