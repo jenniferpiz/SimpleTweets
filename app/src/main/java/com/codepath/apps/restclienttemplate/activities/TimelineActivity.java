@@ -290,7 +290,14 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         client.postNewTweet(s, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
+                try {
+                    Tweet t = Tweet.fromJSON(response);
+                    tweets.add(0, t);
+                    tweetAdapter.notifyItemInserted(0);
+                    rvTweets.scrollToPosition(0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
