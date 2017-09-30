@@ -12,6 +12,8 @@ public class Tweet {
     public long uid;
     public String createdAt;
     public User user;
+    public String url;
+    public String displayURL;
 
     public static Tweet fromJSON(JSONObject jsonObject) throws JSONException {
         Tweet tweet = new Tweet();
@@ -20,6 +22,10 @@ public class Tweet {
         tweet.createdAt = jsonObject.getString("created_at");
         tweet.uid = jsonObject.getLong("id");
         tweet.user = User.fromJSON(jsonObject.getJSONObject("user"));
+
+        JSONObject urlObj = (JSONObject) jsonObject.getJSONObject("entities").getJSONArray("urls").get(0);
+        tweet.url = urlObj.getString("url");
+        tweet.displayURL = urlObj.getString("display_url");
 
         return tweet;
 
