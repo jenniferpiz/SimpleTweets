@@ -23,9 +23,17 @@ public class Tweet {
         tweet.uid = jsonObject.getLong("id");
         tweet.user = User.fromJSON(jsonObject.getJSONObject("user"));
 
-        JSONObject urlObj = (JSONObject) jsonObject.getJSONObject("entities").getJSONArray("urls").get(0);
-        tweet.url = urlObj.getString("url");
-        tweet.displayURL = urlObj.getString("display_url");
+        JSONObject urlObj;
+        JSONObject entObj = (JSONObject) jsonObject.getJSONObject("entities");
+        if (entObj.getJSONArray("urls").length() > 0) {
+            urlObj = (JSONObject) entObj.getJSONArray("urls").get(0);
+            tweet.url = urlObj.getString("url");
+        }
+
+        if (!entObj.isNull("media")) {
+            urlObj = (JSONObject) entObj.getJSONArray("media").get(0);
+            tweet.displayURL = urlObj.getString("media_url");
+        }
 
         return tweet;
 

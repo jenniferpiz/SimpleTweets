@@ -1,9 +1,13 @@
 package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +18,9 @@ import com.bumptech.glide.Glide;
 import com.codepath.apps.restclienttemplate.R;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -42,6 +49,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         View tweetView = inflater.inflate(R.layout.item_tweet_img, parent, false);
 
         ViewHolder viewHolder = new ViewHolder(tweetView);
+
         return viewHolder;
     }
 
@@ -62,6 +70,15 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         holder.tvTimeStamp.setText(getRelativeTimeAgo(tweet.createdAt));
 
         Glide.with(context).load(tweet.user.profileImageUrl).into(holder.ivProfileImage);
+
+
+
+        if (tweet.displayURL  != null) {
+            new MyAsyncTask(holder.ivDisplay).execute(tweet.displayURL);
+            //Glide.with(context).load(tweet.url).into(holder.ivDisplay);
+        }
+
+
 
     }
 
@@ -98,11 +115,63 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         return mTweets.size();
     }
 
+
+    private class MyAsyncTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView imageView;
+
+        MyAsyncTask(ImageView imageView) {
+            this.imageView = imageView;
+        }
+
+        protected void onPreExecute() {
+            // Runs on the UI thread before doInBackground
+            // Good for toggling visibility of a progress indicator
+            //progressBar.setVisibility(ProgressBar.VISIBLE);
+        }
+
+        protected Bitmap doInBackground(String... urls) {
+            String urlStr = urls[0];
+
+            Bitmap bmp = null;
+            
+            try {
+                URL url = new URL(urlStr);
+                HttpURLConnection connection  = (HttpURLConnection) url.openConnection();
+
+                InputStream in = connection.getInputStream();
+                //InputStream in = new java.net.URL(url).openStream();
+
+                bmp = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+
+            return bmp;
+        }
+
+
+
+        protected void onPostExecute(Bitmap result) {
+            // This method is executed in the UIThread
+            // with access to the result of the long running task
+            super.onPostExecute(result);
+
+            imageView.setImageBitmap(result);
+            // Hide the progress bar
+            //progressBar.setVisibility(ProgressBar.INVISIBLE);
+        }
+    }
+
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivProfileImage;
         public TextView tvUserName;
         public TextView tvBody;
         public TextView tvTimeStamp;
+        public ImageView ivDisplay;
+        //public TextView tvBody;
+
 
         public ViewHolder (View itemView) {
             super(itemView);
@@ -111,6 +180,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
             tvUserName = (TextView)itemView.findViewById(R.id.tvUserName);
             tvBody = (TextView)itemView.findViewById(R.id.tvBody);
             tvTimeStamp = (TextView)itemView.findViewById(R.id.tvTimeStamp);
+            ivDisplay = (ImageView)itemView.findViewById(R.id.ivDisplay);
 
         }
 

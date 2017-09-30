@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.R;
@@ -36,6 +37,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
     private TweetAdapter tweetAdapter;
     private ArrayList<Tweet> tweets;
     private RecyclerView rvTweets;
+    private TextView tvBody;
     private ArrayList<Tweet> dbTweets;
     private EndlessRecyclerViewScrollListener scrollListener;
     static private PostsDatabaseHelper db;
@@ -50,7 +52,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         db = PostsDatabaseHelper.getInstance(this);
 
         //TODO for debugging only
-        //db.deleteAllPostsAndUsers();
+        db.deleteAllPostsAndUsers();
 
 
         client = TwitterApp.getRestClient();
@@ -111,6 +113,11 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         };
 
         rvTweets.addOnScrollListener(scrollListener);
+
+        tvBody = (TextView)findViewById(R.id.tvBody);
+        //tvBody.setOnClickListener(new View.OnClickListener() {
+        //});
+
 
 
     }
