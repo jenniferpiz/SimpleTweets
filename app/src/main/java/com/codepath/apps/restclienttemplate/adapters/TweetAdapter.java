@@ -39,7 +39,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        View tweetView = inflater.inflate(R.layout.item_tweet, parent, false);
+        View tweetView = inflater.inflate(R.layout.item_tweet_img, parent, false);
 
         ViewHolder viewHolder = new ViewHolder(tweetView);
         return viewHolder;
@@ -56,7 +56,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         int start = body.indexOf("#") + 1;
         String prefix = body.substring(0, start);
         String suffix = body.substring(start);
-        String newBody = prefix.replace("#", "#"+colorCodeStart) + suffix.replaceFirst(" ", colorCodeEnd+" ");
+        String newBody = prefix.replace("#", colorCodeStart+"#") + suffix.replaceFirst(" ", colorCodeEnd+" ");
         holder.tvBody.setText(Html.fromHtml(newBody));
 
         holder.tvTimeStamp.setText(getRelativeTimeAgo(tweet.createdAt));
