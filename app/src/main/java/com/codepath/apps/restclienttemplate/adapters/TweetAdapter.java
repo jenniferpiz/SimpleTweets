@@ -2,6 +2,7 @@ package com.codepath.apps.restclienttemplate.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,8 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
 
     private List<Tweet> mTweets;
     private Context context;
+    private String colorCodeStart = "<font color='#2DB7EF'>";  // use any color as  your want
+    private String colorCodeEnd = "</font>";
 
     public TweetAdapter(List<Tweet> mTweets) {
         this.mTweets = mTweets;
@@ -47,7 +50,15 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         Tweet tweet = mTweets.get(position);
 
         holder.tvUserName.setText(tweet.user.name);
-        holder.tvBody.setText(tweet.body);
+
+        // change color of tags
+        String body = tweet.body;
+        int start = body.indexOf("#") + 1;
+        String prefix = body.substring(0, start);
+        String suffix = body.substring(start);
+        String newBody = prefix.replace("#", "#"+colorCodeStart) + suffix.replaceFirst(" ", colorCodeEnd+" ");
+        holder.tvBody.setText(Html.fromHtml(newBody));
+
         holder.tvTimeStamp.setText(getRelativeTimeAgo(tweet.createdAt));
 
         Glide.with(context).load(tweet.user.profileImageUrl).into(holder.ivProfileImage);
