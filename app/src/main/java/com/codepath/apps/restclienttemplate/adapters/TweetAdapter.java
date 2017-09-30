@@ -74,8 +74,11 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
 
 
         if (tweet.displayURL  != null) {
+            holder.ivDisplay.setVisibility(View.VISIBLE);
             new MyAsyncTask(holder.ivDisplay).execute(tweet.displayURL);
             //Glide.with(context).load(tweet.url).into(holder.ivDisplay);
+        } else {
+            holder.ivDisplay.setVisibility(View.GONE);
         }
 
 

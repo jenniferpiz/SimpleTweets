@@ -29,15 +29,17 @@
         android:id="@+id/tvBody"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ivProfileImage"
         android:layout_below="@+id/tvUserName"
         android:layout_marginLeft="5dp"
         android:layout_toEndOf="@+id/ivProfileImage"
-        android:fontFamily="serif"
         android:autoLink="web"
+        android:ellipsize="end"
+        android:fontFamily="serif"
         android:linksClickable="true"
+        android:maxLines="4"
         android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textSize="11sp" />
 
     <TextView
         android:id="@+id/tvTimeStamp"
