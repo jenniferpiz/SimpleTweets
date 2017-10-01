@@ -7,10 +7,10 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/ivProfileImage"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         app:civ_border_width="2dp"
-        app:civ_border_color="#FF000000"
+        app:civ_border_color="#FFf2f2f2"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         app:srcCompat="@android:color/black" />
@@ -20,10 +20,11 @@
         android:id="@+id/tvUserName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textStyle="bold"
         android:layout_alignParentTop="true"
-        android:layout_alignStart="@+id/tvBody" />
+        android:layout_alignStart="@+id/tvBody"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/tvBody"
@@ -34,12 +35,10 @@
         android:layout_toEndOf="@+id/ivProfileImage"
         android:autoLink="web"
         android:ellipsize="end"
-        android:fontFamily="serif"
         android:linksClickable="true"
         android:maxLines="4"
         android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textSize="11sp" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
     <TextView
         android:id="@+id/tvTimeStamp"
@@ -48,7 +47,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:text="9h"
-        android:textAppearance="@style/TextAppearance.AppCompat.Notification.Info.Media" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Notification.Info.Media"
+        android:textColor="@android:color/darker_gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,8 +61,8 @@
 
         <ImageView
             android:id="@+id/ivDisplay"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/linearLayout2"
             android:layout_gravity="center"

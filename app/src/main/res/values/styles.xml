@@ -1,9 +1,4 @@
 <resources>
-    <!-- Define your colors in `res/values/colors.xml` -->
-    <color name="simple_yellow">#ECD078</color>
-    <color name="primary_blue">#53777A</color>
-    <color name="off_white">#f2f2f2</color>
-    <color name="tweet_blue">#2DB7EF</color>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/MyActionBar</item>

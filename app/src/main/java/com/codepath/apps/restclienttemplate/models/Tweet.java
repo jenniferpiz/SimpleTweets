@@ -30,7 +30,7 @@ public class Tweet {
             tweet.url = urlObj.getString("url");
         }
 
-        if (!entObj.isNull("media")) {
+        if (!entObj.isNull("media") && (entObj.getJSONArray("media").length() > 0)) {
             urlObj = (JSONObject) entObj.getJSONArray("media").get(0);
             tweet.displayURL = urlObj.getString("media_url");
         }
