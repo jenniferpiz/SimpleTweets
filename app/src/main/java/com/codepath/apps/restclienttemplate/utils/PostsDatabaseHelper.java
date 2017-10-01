@@ -132,6 +132,43 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // Insert a post into the database
+    public void addAllPosts(ArrayList<Tweet> posts) {
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+
+
+        try {
+            for (Tweet post : posts) {
+                // The user might already exist in the database (i.e. the same user created multiple posts).
+                long userId = addOrUpdateUser(post.user);
+
+                ContentValues values = new ContentValues();
+                values.put(KEY_POST_USER_ID_FK, (Long) userId);
+                values.put(KEY_POST_TEXT, post.body);
+                values.put(KEY_TWEET_ID, (Long) post.uid);
+                values.put(KEY_POST_CREATED, post.createdAt);
+
+                // try to make unique
+                values.put(KEY_POST_ID, (Long) post.uid);
+
+                // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+                db.insertOrThrow(TABLE_POSTS, null, values);
+
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d(TAG, "Error while trying to add post to database");
+        } finally {
+            db.endTransaction();
+        }
+
+    }
+
     // Insert or update a user in the database
     // Since SQLite doesn't support "upsert" we need to fall back on an attempt to UPDATE (in case the
     // user already exists) optionally followed by an INSERT (in case the user does not already exist).

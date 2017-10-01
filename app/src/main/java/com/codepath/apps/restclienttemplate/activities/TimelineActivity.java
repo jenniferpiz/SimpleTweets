@@ -35,6 +35,8 @@ import java.util.Collections;
 
 import cz.msebera.android.httpclient.Header;
 
+import static com.codepath.apps.restclienttemplate.utils.TwitterClient.maxTweets;
+
 public class TimelineActivity extends AppCompatActivity implements TweetFragment.FinishTweetListener {
 
     private TwitterClient client;
@@ -55,7 +57,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         //setup database
         db = PostsDatabaseHelper.getInstance(this);
         //TODO enable for debugging only
-        db.deleteAllPostsAndUsers();
+        //db.deleteAllPostsAndUsers();
 
 
         client = TwitterApp.getRestClient();
@@ -149,6 +151,9 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
 
     public boolean isOnline() {
+        //TODO for debugging only
+        if (false) return false;
+
         Runtime runtime = Runtime.getRuntime();
         try {
             Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
@@ -167,6 +172,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         if (dbTweets.size() > 1) {
             // reverse order
             Collections.reverse(dbTweets);
+            tweets.addAll(dbTweets);
         }
 
         // if online, get updates then insert in the tweets
@@ -174,14 +180,10 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
             if (dbTweets.size() == 0) {
                 populateTimeline(1);
             } else {
-                // query latest tweets
+                // pull newest tweets
                 populateTimeline(- dbTweets.get(0).uid);
-
             }
-        } else {
-            tweets = dbTweets;
         }
-
     }
 
     /*
@@ -201,39 +203,60 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 Log.d("TwitterClient", response.toString());
 
+                ArrayList<Tweet> newTweets = new ArrayList<Tweet>();
+
                 int startIndex;
+                try {
+                    //check if first = last
+                    if (response.length() > 0 && tweets.size() > 0 &&
+                            Tweet.fromJSON(response.getJSONObject(0)).uid == tweets.get(tweets.size()-1).uid) {
+                        startIndex = 1;
+                    } else {
+                        startIndex = 0;
+                    }
 
-                if (tweetAdapter.getItemCount() != 0) {
-                    // we exclude the first in the list since it duplicates previous query
-                    startIndex = 1;
+
+                    for (int i = startIndex; i < response.length(); i++) {
+                        Tweet tweet = null;
+                        try {
+                            tweet = Tweet.fromJSON(response.getJSONObject(i));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        newTweets.add(tweet);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //add to our list
+                addTweets(newTweets, id < 0);
+
+            }
+
+            private void addTweets(ArrayList<Tweet> newTweets, boolean isNew) {
+
+                if (isNew) {
+                    // insert dbTweets to the new tweets, if any
+                    int n_tweets = newTweets.size();  // n_tweets is number of new tweets
+                    if (dbTweets.size() > 0) {
+                        // There's a better way of doing this but to simplify, only add dbTweets
+                        // if new tweets < maxTweets-1
+                        if (n_tweets >0 && n_tweets < (maxTweets - 1)) {
+                            tweets.addAll(0, newTweets);
+                            db.addAllPosts(newTweets);
+                            tweetAdapter.notifyItemRangeInserted(0, n_tweets);
+                        }
+                        dbTweets.clear(); // clear so it doesn't get added again
+                    }
                 } else {
-                    // initially, there won't be a duplicate so we can set this to 0
-                    startIndex = 0;
+                    // append new tweets to our list
+                    int n_tweets = newTweets.size();
+                    int oldSize = tweets.size();
+                    tweets.addAll(newTweets);
+                    db.addAllPosts(newTweets);
+                    tweetAdapter.notifyItemRangeInserted(oldSize, n_tweets);
                 }
 
-                for (int i = startIndex; i < response.length(); i++) {
-                    Tweet tweet = null;
-                    try {
-                        tweet = Tweet.fromJSON(response.getJSONObject(i));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    tweets.add(tweet);
-                    db.addPost((tweet));
-                    tweetAdapter.notifyItemInserted(tweets.size()-1); // TODO: delete this?
-                }
-
-                // add dbTweets to the new tweets, if any
-                int n_tweets = tweets.size();  // n_tweets is number of new tweets
-                if (dbTweets.size() > 0) {
-                    // There's a better way of doing this but to simplify, only add dbTweets
-                    // if new tweets < maxTweets-1
-                    if (n_tweets < (TwitterClient.maxTweets - 1)) {
-                        tweets.addAll(dbTweets);
-                        tweetAdapter.notifyItemRangeInserted(n_tweets, dbTweets.size()-1);
-                    }
-                    dbTweets.clear(); // clear so it doesn't get added again
-                }
             }
 
             @Override
