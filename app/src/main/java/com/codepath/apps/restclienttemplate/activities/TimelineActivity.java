@@ -77,7 +77,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
                 AlertDialog.Builder b = new AlertDialog.Builder(TimelineActivity.this);
                 b.setMessage(tweet.body);
-                b.setTitle("@"+tweet.user.screenName);
+                b.setTitle("@"+tweet.user.name);
                 b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -224,9 +224,10 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
                     // if too many new tweets, we just clear everything and start fresh
                     if (n_tweets > (maxTweets - 1)) {
+                        int size = tweets.size();
                         tweets.clear();
                         db.deleteAllPostsAndUsers();
-                        tweetAdapter.notifyItemRangeRemoved(0, tweets.size() -1 );
+                        tweetAdapter.notifyItemRangeRemoved(0, size );
                     }
 
                     if (n_tweets >0 ) {
@@ -285,13 +286,13 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
     public void onPassTweetMsg(String s) {
         String tweetMsg = s;
 
+        // update first before posting new tweet
+        populateTimeline(- tweets.get(0).uid);
+
         client.postNewTweet(s, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-                    // update first before adding new one to top of the list
-                    populateTimeline(- tweets.get(0).uid);
-
                     // add new tweet
                     Tweet t = Tweet.fromJSON(response);
                     tweets.add(0, t);
