@@ -44,7 +44,6 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
     private ArrayList<Tweet> tweets;
     private RecyclerView rvTweets;
     private TextView tvBody;
-    private ArrayList<Tweet> dbTweets;
     private EndlessRecyclerViewScrollListener scrollListener;
     static private PostsDatabaseHelper db;
 
@@ -56,13 +55,10 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
         //setup database
         db = PostsDatabaseHelper.getInstance(this);
-        //TODO enable for debugging only
-        //db.deleteAllPostsAndUsers();
-
 
         client = TwitterApp.getRestClient();
 
-        // initializie tweets
+        // initialize tweets
         initTweets();
 
         rvTweets = (RecyclerView) findViewById(R.id.rvTweet);
@@ -151,8 +147,6 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
 
     public boolean isOnline() {
-        //TODO for debugging only
-        if (false) return false;
 
         Runtime runtime = Runtime.getRuntime();
         try {
@@ -166,6 +160,8 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
 
     private void initTweets() {
+        ArrayList<Tweet> dbTweets;
+
         tweets = new ArrayList<Tweet>();
 
         dbTweets = (ArrayList<Tweet>)db.getAllPosts();
@@ -205,50 +201,48 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
                 ArrayList<Tweet> newTweets = new ArrayList<Tweet>();
 
-                int startIndex;
-                try {
-                    //check if first = last
-                    if (response.length() > 0 && tweets.size() > 0 &&
-                            Tweet.fromJSON(response.getJSONObject(0)).uid == tweets.get(tweets.size()-1).uid) {
-                        startIndex = 1;
-                    } else {
-                        startIndex = 0;
+                for (int i = 0; i < response.length(); i++) {
+                    Tweet tweet = null;
+                    try {
+                        tweet = Tweet.fromJSON(response.getJSONObject(i));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
-
-                    for (int i = startIndex; i < response.length(); i++) {
-                        Tweet tweet = null;
-                        try {
-                            tweet = Tweet.fromJSON(response.getJSONObject(i));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        newTweets.add(tweet);
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                    newTweets.add(tweet);
                 }
+
                 //add to our list
                 addTweets(newTweets, id < 0);
 
             }
 
-            private void addTweets(ArrayList<Tweet> newTweets, boolean isNew) {
+            private void addTweets(ArrayList<Tweet> newTweets, boolean isPrepend) {
 
-                if (isNew) {
-                    // insert dbTweets to the new tweets, if any
-                    int n_tweets = newTweets.size();  // n_tweets is number of new tweets
-                    if (dbTweets.size() > 0) {
-                        // There's a better way of doing this but to simplify, only add dbTweets
-                        // if new tweets < maxTweets-1
-                        if (n_tweets >0 && n_tweets < (maxTweets - 1)) {
-                            tweets.addAll(0, newTweets);
-                            db.addAllPosts(newTweets);
-                            tweetAdapter.notifyItemRangeInserted(0, n_tweets);
-                        }
-                        dbTweets.clear(); // clear so it doesn't get added again
+                if (isPrepend) {
+
+                    int n_tweets = newTweets.size();
+
+                    // if too many new tweets, we just clear everything and start fresh
+                    if (n_tweets > (maxTweets - 1)) {
+                        tweets.clear();
+                        db.deleteAllPostsAndUsers();
+                        tweetAdapter.notifyItemRangeRemoved(0, tweets.size() -1 );
                     }
+
+                    if (n_tweets >0 ) {
+                        tweets.addAll(0, newTweets);
+                        db.addAllPosts(newTweets);
+                        tweetAdapter.notifyItemRangeInserted(0, n_tweets);
+                    }
+
                 } else {
+                    //check if first = last
+                    if (newTweets.size() > 0 && tweets.size() > 0 &&
+                            newTweets.get(0).uid == tweets.get(tweets.size()-1).uid) {
+                        //remove first tweet
+                        newTweets.remove(0);
+                    }
+
                     // append new tweets to our list
                     int n_tweets = newTweets.size();
                     int oldSize = tweets.size();
