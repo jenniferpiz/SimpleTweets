@@ -83,8 +83,6 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
     }
 
 
-
-
     private String getRelativeTimeAgo(String rawJsonDate) {
         String twitterFormat = "EEE MMM dd HH:mm:ss ZZZZZ yyyy";
         SimpleDateFormat sf = new SimpleDateFormat(twitterFormat, Locale.ENGLISH);
@@ -103,9 +101,12 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         String str;
         if ("Yesterday".equals(relativeDate)) {
             str = "1d";
-        } else {
+        } else if (relativeDate.substring(0, 1).matches("[0-9]")) {
             int cutIndex = relativeDate.indexOf(' ') + 1;
             str = relativeDate.replace(" ", "").substring(0, cutIndex);
+        } else {
+            int pos = relativeDate.indexOf(",");
+            str = relativeDate.substring(0, pos);
         }
 
         return str;
