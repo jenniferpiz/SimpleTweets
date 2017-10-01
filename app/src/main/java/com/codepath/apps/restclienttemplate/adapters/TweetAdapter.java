@@ -59,29 +59,26 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
 
         holder.tvUserName.setText(tweet.user.name);
 
-        // change color of tags
+        // change color of tags, this was before I found out API has offset values
         String body = tweet.body;
         int start = body.indexOf("#") + 1;
         String prefix = body.substring(0, start);
         String suffix = body.substring(start);
         String newBody = prefix.replace("#", colorCodeStart+"#") + suffix.replaceFirst(" ", colorCodeEnd+" ");
+
         holder.tvBody.setText(Html.fromHtml(newBody));
 
         holder.tvTimeStamp.setText(getRelativeTimeAgo(tweet.createdAt));
 
         Glide.with(context).load(tweet.user.profileImageUrl).into(holder.ivProfileImage);
 
-
-
         if (tweet.displayURL  != null) {
+            // only for media but can be extended to support unfurling
             holder.ivDisplay.setVisibility(View.VISIBLE);
             new MyAsyncTask(holder.ivDisplay).execute(tweet.displayURL);
-            //Glide.with(context).load(tweet.url).into(holder.ivDisplay);
         } else {
             holder.ivDisplay.setVisibility(View.GONE);
         }
-
-
 
     }
 
@@ -173,7 +170,6 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         public TextView tvBody;
         public TextView tvTimeStamp;
         public ImageView ivDisplay;
-        //public TextView tvBody;
 
 
         public ViewHolder (View itemView) {

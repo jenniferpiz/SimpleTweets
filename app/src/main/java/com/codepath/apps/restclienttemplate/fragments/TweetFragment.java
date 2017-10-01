@@ -3,10 +3,10 @@ package com.codepath.apps.restclienttemplate.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,22 +49,20 @@ public class TweetFragment extends DialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
         etTweetMsg = (EditText) view.findViewById(R.id.etTweetMsg);
-        // Fetch arguments from bundle and set title
-        String title = getArguments().getString("title", "Tweet");
-        getDialog().setTitle(title);
+
         // Show soft keyboard automatically and request focus to field
         etTweetMsg.requestFocus();
         getDialog().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-
 
         Button btn = (Button)view.findViewById(R.id.btnTweet);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Log.d("DEBUG", "on tweet button click");
                 FinishTweetListener l = (FinishTweetListener)getActivity();
                 l.onPassTweetMsg(etTweetMsg.getText().toString());
 
@@ -75,6 +73,4 @@ public class TweetFragment extends DialogFragment {
         });
     }
 
-
-    
 }
