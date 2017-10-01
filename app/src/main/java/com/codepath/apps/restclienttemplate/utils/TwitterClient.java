@@ -44,8 +44,12 @@ public class TwitterClient extends OAuthBaseClient {
 						context.getString(R.string.intent_scheme), context.getPackageName(), FALLBACK_URL));
 	}
 
-
-	public void getHomeTimeline(long id, AsyncHttpResponseHandler handler) {
+    /*
+    params
+    id : a negative value means get tweets newer than id so we use since_id
+    a positive value means we get tweets older than id so we use max_id
+    */
+    public void getHomeTimeline(long id, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		// Can specify query string params directly or through RequestParams.
 		RequestParams params = new RequestParams();

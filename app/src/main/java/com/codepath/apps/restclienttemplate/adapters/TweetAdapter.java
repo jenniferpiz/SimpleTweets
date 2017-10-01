@@ -37,9 +37,12 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
     private String colorCodeStart = "<font color='#2DB7EF'>";  // use any color as  your want
     private String colorCodeEnd = "</font>";
 
-    public TweetAdapter(List<Tweet> mTweets) {
+
+    public TweetAdapter(List<Tweet> mTweets, OnItemClickListener listener) {
         this.mTweets = mTweets;
+        this.listener = listener;
     }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -48,7 +51,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
 
         View tweetView = inflater.inflate(R.layout.item_tweet_img, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(tweetView);
+        ViewHolder viewHolder = new ViewHolder(tweetView, listener);
 
         return viewHolder;
     }
@@ -166,6 +169,17 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         }
     }
 
+    // Define listener member variable
+    private OnItemClickListener listener;
+    // Define the listener interface
+    public interface OnItemClickListener {
+        void onItemClick(View itemView, int position);
+    }
+    // Define the method that allows the parent activity or fragment to define the listener
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView ivProfileImage;
@@ -175,7 +189,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         public ImageView ivDisplay;
 
 
-        public ViewHolder (View itemView) {
+        public ViewHolder (final View itemView, final OnItemClickListener listener) {
             super(itemView);
 
             ivProfileImage = (ImageView)itemView.findViewById(R.id.ivProfileImage);
@@ -184,6 +198,14 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
             tvTimeStamp = (TextView)itemView.findViewById(R.id.tvTimeStamp);
             ivDisplay = (ImageView)itemView.findViewById(R.id.ivDisplay);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(itemView, position);
+                    }
+                }
+            });
         }
 
     }

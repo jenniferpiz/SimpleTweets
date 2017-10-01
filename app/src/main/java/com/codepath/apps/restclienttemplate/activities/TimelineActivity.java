@@ -1,5 +1,7 @@
 package com.codepath.apps.restclienttemplate.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -9,12 +11,13 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codepath.apps.restclienttemplate.R;
-import com.codepath.apps.restclienttemplate.apps.TwitterApp;
 import com.codepath.apps.restclienttemplate.adapters.TweetAdapter;
+import com.codepath.apps.restclienttemplate.apps.TwitterApp;
 import com.codepath.apps.restclienttemplate.fragments.TweetFragment;
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.codepath.apps.restclienttemplate.utils.EndlessRecyclerViewScrollListener;
@@ -52,7 +55,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         //setup database
         db = PostsDatabaseHelper.getInstance(this);
         //TODO enable for debugging only
-        //db.deleteAllPostsAndUsers();
+        db.deleteAllPostsAndUsers();
 
 
         client = TwitterApp.getRestClient();
@@ -68,7 +71,28 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvTweets.setLayoutManager(linearLayoutManager);
 
-        tweetAdapter = new TweetAdapter(tweets);
+        tweetAdapter = new TweetAdapter(tweets, new TweetAdapter.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(View view, int position) {
+                Tweet tweet = tweets.get(position);
+
+                AlertDialog.Builder b = new AlertDialog.Builder(TimelineActivity.this);
+                b.setMessage(tweet.body);
+                b.setTitle("@"+tweet.user.screenName);
+                b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (dialog != null)  {
+                            dialog.dismiss();
+                        }
+                    }
+
+                });
+                b.show();
+            }
+        });
+
         rvTweets.setAdapter(tweetAdapter);
 
         // Attach the listener to the AdapterView onCreate
@@ -160,7 +184,11 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
     }
 
-
+    /*
+    params
+    id : a negative value means get tweets newer than id
+         a positive value means we get tweets older than id
+     */
     private void populateTimeline (final long id) {
 
         client.getHomeTimeline(id, new JsonHttpResponseHandler() {
