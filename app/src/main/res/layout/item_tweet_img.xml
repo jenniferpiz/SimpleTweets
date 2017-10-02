@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="5dp"
     android:padding="5dp"
     android:layout_width="match_parent" android:layout_height="wrap_content">
@@ -71,6 +72,17 @@
             app:srcCompat="@drawable/twitter_logo" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvScreenName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textSize="12sp"
+        tools:textColor="@android:color/darker_gray"
+        android:layout_alignBottom="@+id/tvUserName"
+        android:layout_toEndOf="@+id/tvUserName"
+        android:layout_marginStart="13dp" />
 
 
 </RelativeLayout>

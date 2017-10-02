@@ -34,6 +34,7 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
     // User Table Columns
     private static final String KEY_USER_ID = "id";
     private static final String KEY_USER_NAME = "userName";
+    private static final String KEY_SCREEN_NAME = "screenName";
     private static final String KEY_USER_PROFILE_PICTURE_URL = "profilePictureUrl";
 
     private static PostsDatabaseHelper sInstance;
@@ -81,6 +82,7 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
                 "(" +
                 KEY_USER_ID + " INTEGER PRIMARY KEY," +
                 KEY_USER_NAME + " TEXT," +
+                KEY_SCREEN_NAME + " TEXT," +
                 KEY_USER_PROFILE_PICTURE_URL + " TEXT" +
                 ")";
 
@@ -184,6 +186,7 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues values = new ContentValues();
             values.put(KEY_USER_NAME, user.name);
+            values.put(KEY_SCREEN_NAME, user.screenName);
             values.put(KEY_USER_PROFILE_PICTURE_URL, user.profileImageUrl);
 
             // First try to update the user in case the user already exists in the database
@@ -242,6 +245,7 @@ public class PostsDatabaseHelper extends SQLiteOpenHelper {
                 do {
                     User newUser = new User();
                     newUser.name = cursor.getString(cursor.getColumnIndex(KEY_USER_NAME));
+                    newUser.screenName = cursor.getString(cursor.getColumnIndex(KEY_SCREEN_NAME));
                     newUser.profileImageUrl = cursor.getString(cursor.getColumnIndex(KEY_USER_PROFILE_PICTURE_URL));
 
                     Tweet newPost = new Tweet();

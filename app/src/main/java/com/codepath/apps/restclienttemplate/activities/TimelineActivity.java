@@ -77,7 +77,7 @@ public class TimelineActivity extends AppCompatActivity implements TweetFragment
 
                 AlertDialog.Builder b = new AlertDialog.Builder(TimelineActivity.this);
                 b.setMessage(tweet.body);
-                b.setTitle("@"+tweet.user.name);
+                b.setTitle("@"+tweet.user.screenName);
                 b.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

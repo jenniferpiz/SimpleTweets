@@ -3,6 +3,7 @@ package com.codepath.apps.restclienttemplate.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -72,6 +73,8 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         holder.tvBody.setText(Html.fromHtml(newBody));
 
         holder.tvTimeStamp.setText(getRelativeTimeAgo(tweet.createdAt));
+        holder.tvScreenName.setText("@"+tweet.user.screenName);
+        holder.tvScreenName.setTextColor(Color.DKGRAY);
 
         Glide.with(context).load(tweet.user.profileImageUrl).into(holder.ivProfileImage);
 
@@ -186,6 +189,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
         public TextView tvUserName;
         public TextView tvBody;
         public TextView tvTimeStamp;
+        public TextView tvScreenName;
         public ImageView ivDisplay;
 
 
@@ -196,6 +200,7 @@ public class TweetAdapter extends RecyclerView.Adapter<TweetAdapter.ViewHolder> 
             tvUserName = (TextView)itemView.findViewById(R.id.tvUserName);
             tvBody = (TextView)itemView.findViewById(R.id.tvBody);
             tvTimeStamp = (TextView)itemView.findViewById(R.id.tvTimeStamp);
+            tvScreenName = (TextView)itemView.findViewById(R.id.tvScreenName);
             ivDisplay = (ImageView)itemView.findViewById(R.id.ivDisplay);
 
             itemView.setOnClickListener(new View.OnClickListener() {
