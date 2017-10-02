@@ -44,7 +44,7 @@ The following **bonus** features are implemented:
 * [ ] When a user leaves the compose view without publishing and there is existing text, prompt to save or delete the draft.  The draft can be resumed from the compose view.
 
 The following **additional** features are implemented:
-I used AsyncTask for image loading instead of Glide.
+* [x] I used AsyncTask for image loading instead of Glide.
 
 * [ ] List anything else that you can get done to improve the app functionality!
 
@@ -52,7 +52,7 @@ I used AsyncTask for image loading instead of Glide.
 
 Here's a walkthrough of implemented user stories:
 
-Link to Video Walkthrough [Imgur](https://imgur.com/ekw8u1o)
+[Link to Video Walkthrough in Imgur](https://imgur.com/ekw8u1o)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
